@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>存存工具人——维西莱妮老师 v.2026-05-22-final</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --bg-input: #0d1117;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --accent: #58a6ff;
+            --accent-hover: #79c0ff;
+            --accent-light: rgba(88, 166, 255, 0.15);
+            --danger: #f85149;
+            --success: #3fb950;
+            --warning: #d29922;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --transition: 0.2s ease;
+            --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .header-brand {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+        .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+        .mode-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: 3px;
+        }
+        .mode-tab {
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .mode-tab:hover { color: var(--text-primary); background: var(--bg-primary); }
+        .mode-tab.active { background: var(--accent); color: #fff; }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .card.collapsed .card-body { display: none; }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .card-title { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); }
+        .collapse-btn {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            transition: transform 0.2s ease;
+        }
+        .card:not(.collapsed) .collapse-btn { transform: rotate(90deg); }
+
+        .form-group { margin-bottom: 12px; }
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 0.875rem;
+            transition: var(--transition);
+            resize: vertical;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+        .form-textarea { min-height: 100px; font-family: var(--font-mono); font-size: 0.8rem; }
+        .form-textarea.tall { min-height: 160px; }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            font-size: 0.825rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--border-color); }
+        .btn-danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+        .btn-danger:hover { background: rgba(248, 81, 73, 0.15); }
+        .btn-success { background: var(--success); color: #fff; border-color: var(--success); }
+        .btn-sm { padding: 4px 10px; font-size: 0.75rem; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .api-link {
+            color: var(--accent);
+            text-decoration: underline;
+            font-size: 0.8rem;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+
+        .content-box {
+            position: relative;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: var(--font-mono);
+            font-size: 0.825rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .content-box br { margin: 0; line-height: inherit; }
+        .content-box-toolbar {
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            padding: 6px 10px;
+            margin: -16px -16px 10px -16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            z-index: 5;
+        }
+        .token-info {
+            font-size: 0.725rem;
+            color: var(--text-muted);
+            margin-right: auto;
+            font-family: var(--font-mono);
+        }
+
+        .chapter-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+        .chapter-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+        .chapter-number { font-weight: 700; color: var(--accent); font-size: 0.9rem; white-space: nowrap; }
+        .chapter-actions { display: flex; gap: 4px; }
+
+        .character-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .character-card:hover { border-color: var(--accent); }
+        .character-card.selected { border-color: var(--accent); background: var(--accent-light); }
+        .character-card-header { display: flex; justify-content: space-between; align-items: center; }
+        .character-name { font-weight: 600; font-size: 0.9rem; }
+        .chat-area {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .chat-msg { margin-bottom: 8px; line-height: 1.7; }
+        .chat-speaker { font-weight: 700; color: var(--accent); }
+        .chat-input-row { display: flex; gap: 8px; margin-top: 10px; }
+        .chat-input-row .form-input { flex: 1; }
+
+        .preview-section {
+            background: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            color: #1f2328;
+            font-family: var(--font-sans);
+            font-size: 0.925rem;
+            line-height: 1.8;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+        .preview-label {
+            font-size: 0.75rem;
+            color: #656d76;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #d0d7de;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            max-width: 520px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        .modal h3 { margin-bottom: 16px; color: var(--accent); }
+
+        .doc-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+        .doc-list-item:last-child { border-bottom: none; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        @media (max-width: 768px) {
+            .header { padding: 12px 16px; }
+            .main-container { padding: 12px 16px; }
+            .mode-tabs { width: 100%; overflow-x: auto; }
+            .card { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== 顶栏 ========== -->
+    <header class="header">
+        <span class="header-brand" id="headerTitle">🧰 存存工具人——维西莱妮老师 v.2026-05-22-final</span>
+        <div class="header-actions">
+            <div class="mode-tabs" id="modeTabs">
+                <button class="mode-tab active" data-mode="longtext">📝 单次长文本</button>
+                <button class="mode-tab" data-mode="novel">📖 小说创作</button>
+                <button class="mode-tab" data-mode="chat">💬 对话模式</button>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="openSaveProfileModal()">💾 保存设置</button>
+            <button class="btn btn-secondary btn-sm" onclick="openLoadProfileModal()">📂 加载方案</button>
+        </div>
+    </header>
+
+    <!-- ========== 主容器 ========== -->
+    <div class="main-container" id="mainContainer"></div>
+
+    <!-- ========== 弹窗容器 ========== -->
+    <div id="modalContainer"></div>
+
+    <script>
+        (function() {
+            // ==================== 状态管理 ====================
+            const STORAGE_KEY = 'deepseek_tool_state_v6';
+            const PROFILES_KEY = 'deepseek_tool_profiles_v6';
+
+            const state = {
+                currentMode: 'longtext',
+                currentModel: 'deepseek-v4-pro',
+                maxTokens: 256000,
+                apiKey: '',
+                systemPromptLongtext: '',
+                systemPromptNovel: '',
+                systemPromptChat: '',
+                longtextUserPrompt: '',
+                longtextResult: '',
+                novelTitle: '',
+                novelChapters: [],
+                chatCharacters: [],
+                chatCurrentCharacterIndex: -1,
+                chatHistory: [],
+                chatContextCount: 5,
+                chatUserInput: '',
+                chatUserName: '用户',
+                collapsedCards: { api: false, mode: false, preview: false },
+                importedDocs: []   // { name, content, size, time }
+            };
+
+            function getCurrentSystemPrompt() {
+                switch (state.currentMode) {
+                    case 'longtext': return state.systemPromptLongtext;
+                    case 'novel': return state.systemPromptNovel;
+                    case 'chat': return state.systemPromptChat;
+                    default: return '';
+                }
+            }
+            function setCurrentSystemPrompt(value) {
+                switch (state.currentMode) {
+                    case 'longtext': state.systemPromptLongtext = value; break;
+                    case 'novel': state.systemPromptNovel = value; break;
+                    case 'chat': state.systemPromptChat = value; break;
+                }
+            }
+
+            // ==================== 持久化 ====================
+            function saveState() {
+                const toSave = { ...state };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+            }
+            function loadState() {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                try {
+                    const saved = JSON.parse(raw);
+                    Object.keys(saved).forEach(key => {
+                        if (key in state) state[key] = saved[key];
+                    });
+                    if (saved.systemPrompt && !state.systemPromptLongtext) {
+                        state.systemPromptLongtext = saved.systemPrompt;
+                        state.systemPromptNovel = saved.systemPrompt;
+                        state.systemPromptChat = saved.systemPrompt;
+                    }
+                    if (!state.currentModel) state.currentModel = 'deepseek-v4-pro';
+                    if (!state.maxTokens) state.maxTokens = 256000;
+                    if (!state.collapsedCards) state.collapsedCards = { api: false, mode: false, preview: false };
+                    if (!state.chatUserName) state.chatUserName = '用户';
+                    if (!state.importedDocs) state.importedDocs = [];
+                    state.novelChapters.forEach(ch => { if (!ch.content) ch.content = ''; });
+                } catch (e) { console.warn('状态加载失败'); }
+            }
+
+            function saveProfiles(profiles) { localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles)); }
+            function loadProfiles() {
+                const raw = localStorage.getItem(PROFILES_KEY);
+                return raw ? JSON.parse(raw) : [];
+            }
+
+            // ==================== Token 计数 ====================
+            function estimateTokens(text) {
+                if (!text) return 0;
+                let tokens = 0;
+                const cjk = text.match(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/g) || [];
+                tokens += cjk.length * 2;
+                const nonCjk = text.replace(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/g, ' ');
+                const words = nonCjk.trim().split(/\s+/).filter(w => w.length > 0);
+                tokens += Math.round(words.length * 1.33);
+                return Math.max(1, tokens);
+            }
+
+            // ==================== 通用复制函数（兼容移动端） ====================
+            function copyText(text) {
+                if (!text) return;
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert('已复制到剪贴板');
+                    }).catch(() => {
+                        fallbackCopy(text);
+                    });
+                } else {
+                    fallbackCopy(text);
+                }
+            }
+            function fallbackCopy(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                textarea.style.top = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('已复制到剪贴板');
+                } catch (e) {
+                    alert('复制失败，请手动复制');
+                }
+                document.body.removeChild(textarea);
+            }
+
+            // ==================== 渲染 ====================
+            function renderAll() {
+                document.getElementById('headerTitle').textContent =
+                    `🧰 存存工具人——维西莱妮老师 v.${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${new Date().toTimeString().slice(0,5).replace(':', '')}`;
+
+                const container = document.getElementById('mainContainer');
+                container.innerHTML = renderSettingsCard() + renderModeCard() + renderPreviewCard();
+                bindEvents();
+                document.querySelectorAll('.mode-tab').forEach(t => {
+                    t.classList.toggle('active', t.dataset.mode === state.currentMode);
+                });
+                applyCollapseState();
+            }
+
+            function applyCollapseState() {
+                const apiCard = document.getElementById('apiSettingsCard');
+                const modeCard = document.getElementById('modeCard');
+                const previewCard = document.getElementById('previewCard');
+                if (apiCard) apiCard.classList.toggle('collapsed', state.collapsedCards.api);
+                if (modeCard) modeCard.classList.toggle('collapsed', state.collapsedCards.mode);
+                if (previewCard) previewCard.classList.toggle('collapsed', state.collapsedCards.preview);
+            }
+
+            function formatText(text) {
+                return escapeHtml(text).replace(/\n+/g, '<br>');
+            }
+
+            function renderSettingsCard() {
+                const sysPrompt = getCurrentSystemPrompt();
+                let docsHtml = '';
+                if (state.importedDocs.length > 0) {
+                    docsHtml = state.importedDocs.map((doc, i) => `
+                        <div class="doc-list-item">
+                            <span>📄 ${escapeHtml(doc.name)} (${doc.content.length} 字)</span>
+                            <button class="btn btn-sm btn-danger delete-doc-btn" data-index="${i}">✕</button>
+                        </div>
+                    `).join('');
+                } else {
+                    docsHtml = '<div style="font-size:0.8rem; color:var(--text-muted);">暂无导入文档</div>';
+                }
+
+                return `
+                <div class="card" id="apiSettingsCard">
+                    <div class="card-header" id="apiCardHeader">
+                        <span class="card-title">🔑 API 与模型设置</span>
+                        <span class="collapse-btn">▶</span>
+                    </div>
+                    <div class="card-body">
+                        <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label class="form-label">API Key <a href="https://platform.deepseek.com/api_keys" target="_blank" class="api-link">🔗 获取API Key</a></label>
+                                <input type="password" class="form-input" id="apiKeyInput" value="${escapeHtml(state.apiKey)}" placeholder="sk-...">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label class="form-label">模型选择</label>
+                                <select class="form-select" id="modelSelect">
+                                    <option value="deepseek-v4-pro" ${state.currentModel==='deepseek-v4-pro'?'selected':''}>DeepSeek-V4-Pro (最强)</option>
+                                    <option value="deepseek-v4-flash" ${state.currentModel==='deepseek-v4-flash'?'selected':''}>DeepSeek-V4-Flash (快速)</option>
+                                    <option value="claude-code" ${state.currentModel==='claude-code'?'selected':''}>Claude Code (Anthropic格式)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label class="form-label">最大输出 Token (≤256K)</label>
+                                <input type="number" class="form-input" id="maxTokensInput" value="${state.maxTokens}" min="1000" max="256000" step="1000">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">系统提示词 (${state.currentMode==='longtext'?'长文本':state.currentMode==='novel'?'小说':'对话'})</label>
+                            <textarea class="form-textarea" id="systemPromptInput" placeholder="为当前模式设定系统提示词...">${escapeHtml(sysPrompt)}</textarea>
+                        </div>
+                        <!-- 文档导入区域 -->
+                        <div class="form-group">
+                            <label class="form-label">📚 导入语料文档 (TXT / Word)，生成时将自动附加【完全参照我给出的文档】</label>
+                            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                <input type="file" id="docFileInput" accept=".txt,.docx" style="display:none;">
+                                <button class="btn btn-secondary btn-sm" id="btnImportDoc">📂 选择文件</button>
+                                <span style="font-size:0.75rem; color:var(--text-muted);">单个文档最大 50 万字，总上限 100 万字</span>
+                            </div>
+                            <div style="margin-top:8px; background:var(--bg-tertiary); border-radius:var(--radius-sm); padding:8px;" id="importedDocsList">
+                                ${docsHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            function renderModeCard() {
+                let cardContent = '';
+                switch (state.currentMode) {
+                    case 'longtext': cardContent = renderLongtextCard(); break;
+                    case 'novel': cardContent = renderNovelCard(); break;
+                    case 'chat': cardContent = renderChatCard(); break;
+                }
+                return `
+                <div class="card" id="modeCard">
+                    <div class="card-header" id="modeCardHeader">
+                        <span class="card-title">${state.currentMode==='longtext'?'📝 单次长文本':state.currentMode==='novel'?'📖 小说创作':'💬 对话模式'}</span>
+                        <span class="collapse-btn">▶</span>
+                    </div>
+                    <div class="card-body">
+                        ${cardContent}
+                    </div>
+                </div>`;
+            }
+
+            function renderLongtextCard() {
+                return `
+                <div>
+                    <div class="form-group">
+                        <label class="form-label">用户提示词</label>
+                        <textarea class="form-textarea tall" id="longtextPromptInput">${escapeHtml(state.longtextUserPrompt)}</textarea>
+                    </div>
+                    <button class="btn btn-primary" id="btnLongtextGenerate" style="margin-bottom:12px;">🚀 生成</button>
+                    <div class="content-box" id="longtextContentBox">
+                        <div class="content-box-toolbar">
+                            <span class="token-info" id="longtextTokenInfo">字数: ${state.longtextResult.length} | Token: ${estimateTokens(state.longtextResult)}</span>
+                            <button class="btn btn-sm btn-secondary" id="btnLongtextClear">🗑 清除</button>
+                            <button class="btn btn-sm btn-secondary" id="btnLongtextRegen">🔄 重新生成</button>
+                            <button class="btn btn-sm btn-secondary" id="btnLongtextCopy">📋 复制</button>
+                        </div>
+                        <div id="longtextContent">${state.longtextResult ? formatText(state.longtextResult) : '<span style="color:var(--text-muted)">等待生成...</span>'}</div>
+                    </div>
+                </div>`;
+            }
+
+            function renderNovelCard() {
+                let chaptersHtml = '';
+                state.novelChapters.forEach((ch, i) => {
+                    chaptersHtml += `
+                    <div class="chapter-item" data-chapter-index="${i}">
+                        <div class="chapter-header">
+                            <span class="chapter-number">第 ${i + 1} 章</span>
+                            <div class="chapter-actions">
+                                <button class="btn btn-sm btn-primary chapter-generate" data-index="${i}">⚡ 生成</button>
+                                <button class="btn btn-sm btn-secondary chapter-copy" data-index="${i}">📋</button>
+                                <button class="btn btn-sm btn-secondary chapter-clear" data-index="${i}">🗑</button>
+                                <button class="btn btn-sm btn-secondary chapter-regen" data-index="${i}">🔄</button>
+                                <button class="btn btn-sm btn-danger chapter-delete" data-index="${i}">✕</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">梗概</label>
+                            <textarea class="form-textarea chapter-summary" data-index="${i}" rows="2">${escapeHtml(ch.summary)}</textarea>
+                        </div>
+                        <div class="content-box" style="max-height:250px;" id="chapterContentBox${i}">
+                            <div class="content-box-toolbar">
+                                <span class="token-info chapter-token-info" data-index="${i}">字数: ${ch.content.length} | Token: ${estimateTokens(ch.content)}</span>
+                            </div>
+                            <div class="chapter-content-display" data-index="${i}">${ch.content ? formatText(ch.content) : '<span style="color:var(--text-muted)">尚未生成</span>'}</div>
+                        </div>
+                    </div>`;
+                });
+
+                return `
+                <div>
+                    <div class="form-group">
+                        <label class="form-label">小说标题</label>
+                        <input type="text" class="form-input" id="novelTitleInput" value="${escapeHtml(state.novelTitle)}" placeholder="输入标题...">
+                    </div>
+                    <div id="chaptersContainer">${chaptersHtml}</div>
+                    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+                        <button class="btn btn-primary" id="btnAddChapter">➕ 添加章节</button>
+                        <button class="btn btn-secondary" id="btnGenerateAll">⚡ 生成所有章节</button>
+                        <button class="btn btn-success" id="btnConcatAll">📋 拼接复制全部</button>
+                        <button class="btn btn-danger" id="btnClearAllChapters">🗑 清除全部</button>
+                    </div>
+                    ${state.novelChapters.length < 3 ? '<p style="color:var(--warning);font-size:0.8rem;margin-top:8px;">⚠️ 建议至少添加 3 个章节</p>' : ''}
+                </div>`;
+            }
+
+            function renderChatCard() {
+                let charsHtml = state.chatCharacters.map((ch, i) => `
+                    <div class="character-card ${i === state.chatCurrentCharacterIndex ? 'selected' : ''}" data-char-index="${i}">
+                        <div class="character-card-header">
+                            <span class="character-name">${escapeHtml(ch.name || '未命名')}</span>
+                            <div>
+                                <button class="btn btn-sm btn-secondary edit-char" data-index="${i}">✎</button>
+                                <button class="btn btn-sm btn-danger delete-char" data-index="${i}">✕</button>
+                            </div>
+                        </div>
+                        <div style="font-size:0.725rem;color:var(--text-muted);">${escapeHtml(ch.identity || '')}</div>
+                    </div>
+                `).join('');
+
+                let historyHtml = state.chatHistory.map(msg =>
+                    `<div class="chat-msg"><span class="chat-speaker" style="color:${msg.speaker===state.chatUserName?'var(--text-secondary)':'var(--accent)'}">${escapeHtml(msg.speaker)}：</span>${formatText(msg.text)}</div>`
+                ).join('') || '<span style="color:var(--text-muted)">开始对话吧...</span>';
+
+                return `
+                <div>
+                    <div class="form-group">
+                        <label class="form-label">你的名称</label>
+                        <input type="text" class="form-input" id="chatUserNameInput" value="${escapeHtml(state.chatUserName)}" placeholder="用户" style="max-width:200px;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">角色管理（最多5个）</label>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">${charsHtml}</div>
+                        <button class="btn btn-sm btn-primary" id="btnAddCharacter">➕ 新增</button>
+                        <button class="btn btn-sm btn-secondary" id="btnRenameCharacter">✎ 重命名当前角色</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">上下文轮数</label>
+                        <input type="number" class="form-input" id="chatContextCount" value="${state.chatContextCount}" min="1" max="50" style="width:120px;">
+                    </div>
+                    <div class="chat-area" id="chatHistoryBox">${historyHtml}</div>
+                    <div class="content-box-toolbar" style="margin-top:4px;">
+                        <span class="token-info" id="chatTokenInfo">字数: ${state.chatHistory.reduce((s,m)=>s+m.text.length,0)} | Token: ${estimateTokens(state.chatHistory.map(m=>m.text).join(' '))}</span>
+                        <button class="btn btn-sm btn-secondary" id="btnChatClear">🗑 清除</button>
+                        <button class="btn btn-sm btn-secondary" id="btnChatCopy">📋 复制</button>
+                    </div>
+                    <div class="chat-input-row">
+                        <input type="text" class="form-input" id="chatUserInput" value="${escapeHtml(state.chatUserInput)}" placeholder="输入消息...">
+                        <button class="btn btn-primary" id="btnChatSend">发送</button>
+                    </div>
+                </div>`;
+            }
+
+            function renderPreviewCard() {
+                let content = '';
+                if (state.currentMode === 'longtext') {
+                    content = state.longtextResult ? formatText(state.longtextResult) : '<p style="color:#999;">暂无内容</p>';
+                } else if (state.currentMode === 'novel') {
+                    content = state.novelChapters.map((ch,i) =>
+                        `<h3>第 ${i+1} 章</h3><p>${formatText(ch.content || '（未生成）')}</p>`
+                    ).join('') || '<p style="color:#999;">暂无章节</p>';
+                } else {
+                    content = state.chatHistory.map(m =>
+                        `<p><strong>${escapeHtml(m.speaker)}：</strong>${formatText(m.text)}</p>`
+                    ).join('') || '<p style="color:#999;">暂无对话</p>';
+                }
+                return `
+                <div class="card" id="previewCard">
+                    <div class="card-header" id="previewCardHeader">
+                        <span class="card-title">📄 预览</span>
+                        <span class="collapse-btn">▶</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview-section">
+                            <div class="preview-label">${state.currentMode==='chat'?'对话记录':state.currentMode==='novel'?(state.novelTitle||'小说'):'长文本'} —— 干净预览</div>
+                            <div id="previewContent">${content}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            function escapeHtml(s) {
+                return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            }
+
+            // ==================== 事件绑定 ====================
+            function bindEvents() {
+                document.querySelectorAll('.mode-tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const newMode = this.dataset.mode;
+                        if (state.currentMode === newMode) return;
+                        const sysInput = document.getElementById('systemPromptInput');
+                        if (sysInput) setCurrentSystemPrompt(sysInput.value);
+                        state.currentMode = newMode;
+                        saveState();
+                        renderAll();
+                    });
+                });
+
+                document.getElementById('apiCardHeader')?.addEventListener('click', () => {
+                    state.collapsedCards.api = !state.collapsedCards.api;
+                    saveState();
+                    applyCollapseState();
+                });
+                document.getElementById('modeCardHeader')?.addEventListener('click', () => {
+                    state.collapsedCards.mode = !state.collapsedCards.mode;
+                    saveState();
+                    applyCollapseState();
+                });
+                document.getElementById('previewCardHeader')?.addEventListener('click', () => {
+                    state.collapsedCards.preview = !state.collapsedCards.preview;
+                    saveState();
+                    applyCollapseState();
+                });
+
+                document.getElementById('apiKeyInput')?.addEventListener('input', e => { state.apiKey = e.target.value; saveState(); });
+                document.getElementById('modelSelect')?.addEventListener('change', e => { state.currentModel = e.target.value; saveState(); });
+                document.getElementById('maxTokensInput')?.addEventListener('change', e => {
+                    let v = parseInt(e.target.value);
+                    if (isNaN(v)) v = 256000;
+                    state.maxTokens = Math.min(256000, Math.max(1000, v));
+                    e.target.value = state.maxTokens;
+                    saveState();
+                });
+                document.getElementById('systemPromptInput')?.addEventListener('input', e => {
+                    setCurrentSystemPrompt(e.target.value);
+                    saveState();
+                });
+
+                // 文档导入按钮
+                document.getElementById('btnImportDoc')?.addEventListener('click', () => {
+                    document.getElementById('docFileInput').click();
+                });
+                document.getElementById('docFileInput')?.addEventListener('change', handleFileImport);
+
+                // 删除文档按钮
+                document.querySelectorAll('.delete-doc-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        state.importedDocs.splice(index, 1);
+                        saveState();
+                        renderAll();
+                    });
+                });
+
+                if (state.currentMode === 'longtext') bindLongtextEvents();
+                else if (state.currentMode === 'novel') bindNovelEvents();
+                else if (state.currentMode === 'chat') bindChatEvents();
+            }
+
+            function bindLongtextEvents() {
+                document.getElementById('longtextPromptInput')?.addEventListener('input', e => { state.longtextUserPrompt = e.target.value; });
+                document.getElementById('btnLongtextGenerate')?.addEventListener('click', generateLongtext);
+                document.getElementById('btnLongtextClear')?.addEventListener('click', () => { state.longtextResult = ''; saveState(); renderAll(); });
+                document.getElementById('btnLongtextRegen')?.addEventListener('click', generateLongtext);
+                document.getElementById('btnLongtextCopy')?.addEventListener('click', () => copyText(state.longtextResult));
+            }
+
+            function bindNovelEvents() {
+                document.getElementById('novelTitleInput')?.addEventListener('input', e => { state.novelTitle = e.target.value; saveState(); });
+                document.getElementById('btnAddChapter')?.addEventListener('click', () => {
+                    state.novelChapters.push({ summary: '', content: '' });
+                    saveState(); renderAll();
+                });
+                document.getElementById('btnGenerateAll')?.addEventListener('click', generateAllChapters);
+                document.getElementById('btnConcatAll')?.addEventListener('click', () => {
+                    if (state.novelChapters.length === 0) return alert('暂无章节');
+                    const all = state.novelChapters.map((ch,i) => `第 ${i+1} 章\n\n${ch.content}`).join('\n\n---\n\n');
+                    copyText(all);
+                });
+                document.getElementById('btnClearAllChapters')?.addEventListener('click', () => {
+                    if (confirm('确定清除所有章节内容？')) {
+                        state.novelChapters.forEach(ch => ch.content = '');
+                        saveState(); renderAll();
+                    }
+                });
+
+                document.querySelectorAll('.chapter-generate').forEach(b => b.addEventListener('click', e => generateSingleChapter(parseInt(e.target.dataset.index))));
+                document.querySelectorAll('.chapter-copy').forEach(b => b.addEventListener('click', e => copyText(state.novelChapters[parseInt(e.target.dataset.index)].content)));
+                document.querySelectorAll('.chapter-clear').forEach(b => b.addEventListener('click', e => {
+                    state.novelChapters[parseInt(e.target.dataset.index)].content = '';
+                    saveState(); renderAll();
+                }));
+                document.querySelectorAll('.chapter-regen').forEach(b => b.addEventListener('click', e => generateSingleChapter(parseInt(e.target.dataset.index))));
+                document.querySelectorAll('.chapter-delete').forEach(b => b.addEventListener('click', e => {
+                    state.novelChapters.splice(parseInt(e.target.dataset.index), 1);
+                    saveState(); renderAll();
+                }));
+                document.querySelectorAll('.chapter-summary').forEach(ta => ta.addEventListener('input', e => {
+                    state.novelChapters[parseInt(e.target.dataset.index)].summary = e.target.value;
+                    saveState();
+                }));
+            }
+
+            function bindChatEvents() {
+                document.getElementById('chatUserNameInput')?.addEventListener('input', e => {
+                    state.chatUserName = e.target.value.trim() || '用户';
+                    saveState();
+                    renderAll();
+                });
+                document.querySelectorAll('.character-card').forEach(card => {
+                    card.addEventListener('click', function(e) {
+                        if (e.target.closest('button')) return;
+                        state.chatCurrentCharacterIndex = parseInt(this.dataset.charIndex);
+                        saveState(); renderAll();
+                    });
+                });
+                document.getElementById('btnAddCharacter')?.addEventListener('click', () => {
+                    if (state.chatCharacters.length >= 5) return alert('最多5个角色，请先删除或覆盖');
+                    openCharacterEditor(-1);
+                });
+                document.getElementById('btnRenameCharacter')?.addEventListener('click', () => {
+                    if (state.chatCurrentCharacterIndex < 0) return alert('请先选择一个角色');
+                    openCharacterEditor(state.chatCurrentCharacterIndex);
+                });
+                document.querySelectorAll('.edit-char').forEach(b => b.addEventListener('click', e => {
+                    e.stopPropagation();
+                    openCharacterEditor(parseInt(e.target.dataset.index));
+                }));
+                document.querySelectorAll('.delete-char').forEach(b => b.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const idx = parseInt(e.target.dataset.index);
+                    state.chatCharacters.splice(idx, 1);
+                    if (state.chatCurrentCharacterIndex === idx) state.chatCurrentCharacterIndex = -1;
+                    else if (state.chatCurrentCharacterIndex > idx) state.chatCurrentCharacterIndex--;
+                    saveState(); renderAll();
+                }));
+                document.getElementById('chatContextCount')?.addEventListener('change', e => { state.chatContextCount = parseInt(e.target.value)||5; saveState(); });
+                document.getElementById('btnChatSend')?.addEventListener('click', sendChatMessage);
+                document.getElementById('chatUserInput')?.addEventListener('keydown', e => { if (e.key==='Enter') sendChatMessage(); });
+                document.getElementById('chatUserInput')?.addEventListener('input', e => { state.chatUserInput = e.target.value; });
+                document.getElementById('btnChatClear')?.addEventListener('click', () => { state.chatHistory = []; saveState(); renderAll(); });
+                document.getElementById('btnChatCopy')?.addEventListener('click', () => {
+                    const text = state.chatHistory.map(m => `${m.speaker}：${m.text}`).join('\n');
+                    copyText(text);
+                });
+            }
+
+            // ==================== 文档导入处理 ====================
+            function handleFileImport(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+
+                if (file.name.endsWith('.txt')) {
+                    reader.onload = function(ev) {
+                        processImportContent(file.name, ev.target.result);
+                    };
+                    reader.readAsText(file, 'UTF-8');
+                } else if (file.name.endsWith('.docx')) {
+                    // 加载 mammoth.js 并提取文本
+                    loadMammoth(() => {
+                        reader.onload = function(ev) {
+                            const arrayBuffer = ev.target.result;
+                            mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+                                .then(result => {
+                                    processImportContent(file.name, result.value);
+                                })
+                                .catch(err => {
+                                    alert('无法解析 Word 文档：' + err.message);
+                                });
+                        };
+                        reader.readAsArrayBuffer(file);
+                    });
+                } else {
+                    alert('仅支持 .txt 和 .docx 文件');
+                }
+                // 清空 file input 以便重复选择同一文件
+                e.target.value = '';
+            }
+
+            function loadMammoth(callback) {
+                if (window.mammoth) {
+                    callback();
+                } else {
+                    const script = document.createElement('script');
+                    script.src = 'https://unpkg.com/mammoth/mammoth.browser.min.js';
+                    script.onload = callback;
+                    script.onerror = () => alert('加载文档解析库失败，请检查网络连接');
+                    document.head.appendChild(script);
+                }
+            }
+
+            function processImportContent(fileName, content) {
+                const MAX_SINGLE_DOC = 500000;   // 单个文档最大字符数
+                const MAX_TOTAL = 1000000;        // 所有文档总字符数上限
+
+                if (content.length > MAX_SINGLE_DOC) {
+                    alert(`文档过大（当前 ${content.length} 字符），单个文档上限 ${MAX_SINGLE_DOC} 字符`);
+                    return;
+                }
+
+                const currentTotal = state.importedDocs.reduce((sum, d) => sum + d.content.length, 0);
+                if (currentTotal + content.length > MAX_TOTAL) {
+                    alert(`语料库总容量将超过 ${MAX_TOTAL} 字符，请先删除部分文档再导入`);
+                    return;
+                }
+
+                state.importedDocs.push({
+                    name: fileName,
+                    content: content,
+                    time: new Date().toISOString()
+                });
+                saveState();
+                renderAll();
+            }
+
+            // ==================== API 调用 ====================
+            function attachDocumentsToSystem(sysPrompt) {
+                if (state.importedDocs.length === 0) return sysPrompt;
+                const docsText = state.importedDocs.map(d => d.content).join('\n\n');
+                return `${sysPrompt}\n\n【完全参照我给出的文档】\n以下为导入的参考文档内容，请严格模仿其风格和知识：\n\`\`\`\n${docsText}\n\`\`\``;
+            }
+
+            async function callAPI(messages, { stream = true } = {}) {
+                if (!state.apiKey) throw new Error('请先输入API Key');
+
+                // 为 system 消息附加文档内容
+                messages = messages.map(m => {
+                    if (m.role === 'system') {
+                        return { ...m, content: attachDocumentsToSystem(m.content) };
+                    }
+                    return m;
+                });
+
+                const model = state.currentModel;
+                const isAnthropic = model === 'claude-code';
+                const url = isAnthropic
+                    ? 'https://api.deepseek.com/anthropic/v1/messages'
+                    : 'https://api.deepseek.com/v1/chat/completions';
+
+                const headers = isAnthropic
+                    ? { 'Content-Type': 'application/json', 'x-api-key': state.apiKey }
+                    : { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.apiKey}` };
+
+                let body;
+                if (isAnthropic) {
+                    const systemMsg = messages.find(m => m.role === 'system');
+                    const userMessages = messages.filter(m => m.role !== 'system').map(m => ({
+                        role: m.role,
+                        content: [{ type: 'text', text: m.content }]
+                    }));
+                    body = {
+                        model: 'deepseek-v4-pro',
+                        max_tokens: state.maxTokens,
+                        stream,
+                        messages: userMessages
+                    };
+                    if (systemMsg) body.system = systemMsg.content;
+                } else {
+                    const modelId = model === 'deepseek-v4-flash' ? 'deepseek-v4-flash' : 'deepseek-v4-pro';
+                    body = {
+                        model: modelId,
+                        messages,
+                        max_tokens: state.maxTokens,
+                        stream,
+                        temperature: 0.8
+                    };
+                }
+
+                const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+                if (!response.ok) {
+                    const err = await response.text();
+                    throw new Error(`API 错误 ${response.status}: ${err}`);
+                }
+                return response;
+            }
+
+            async function readStream(response, isAnthropic, onChunk) {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed || trimmed === 'data: [DONE]') continue;
+                        if (trimmed.startsWith('data: ')) {
+                            try {
+                                const json = JSON.parse(trimmed.slice(6));
+                                let text = '';
+                                if (isAnthropic) {
+                                    if (json.type === 'content_block_delta' && json.delta?.text) text = json.delta.text;
+                                } else {
+                                    if (json.choices?.[0]?.delta?.content) text = json.choices[0].delta.content;
+                                }
+                                if (text) onChunk(text);
+                            } catch (e) { /* 忽略 */ }
+                        }
+                    }
+                }
+            }
+
+            function scrollToBottom(containerId) {
+                const el = document.getElementById(containerId);
+                if (el) el.scrollTop = el.scrollHeight;
+            }
+
+            // ==================== 长文本生成 ====================
+            async function generateLongtext() {
+                const btn = document.getElementById('btnLongtextGenerate');
+                btn.disabled = true;
+                state.longtextResult = '';
+                saveState();
+                updateLongtextDisplay('生成中...');
+                try {
+                    const messages = [];
+                    const sys = state.systemPromptLongtext;
+                    if (sys) messages.push({ role: 'system', content: sys });
+                    messages.push({ role: 'user', content: state.longtextUserPrompt || '请生成一段文本' });
+
+                    const response = await callAPI(messages, { stream: true });
+                    const isAnthropic = state.currentModel === 'claude-code';
+                    await readStream(response, isAnthropic, chunk => {
+                        state.longtextResult += chunk;
+                        updateLongtextDisplay(null);
+                        scrollToBottom('longtextContentBox');
+                    });
+                } catch (e) {
+                    state.longtextResult = `❌ 失败: ${e.message}`;
+                    updateLongtextDisplay(null);
+                } finally {
+                    btn.disabled = false;
+                    saveState();
+                    updatePreview();
+                }
+            }
+
+            function updateLongtextDisplay(status) {
+                const div = document.getElementById('longtextContent');
+                const info = document.getElementById('longtextTokenInfo');
+                if (div) {
+                    if (status) div.textContent = status;
+                    else div.innerHTML = formatText(state.longtextResult);
+                }
+                if (info) info.textContent = `字数: ${state.longtextResult.length} | Token: ${estimateTokens(state.longtextResult)}`;
+            }
+
+            // ==================== 小说章节生成 ====================
+            function buildNovelPrompt(index) {
+                const sys = state.systemPromptNovel || `你是一位专业小说作家，正在创作《${state.novelTitle||'未命名'}》。请严格遵循前文的内容和风格，确保角色、情节、文风高度统一。`;
+                let context = '';
+                const summaries = state.novelChapters.slice(0, index+1).map((ch, i) =>
+                    `第${i+1}章梗概：${ch.summary || '（无）'}`
+                ).join('\n');
+                context += `【故事梗概】\n${summaries}\n\n`;
+
+                const previousContent = state.novelChapters.slice(0, index)
+                    .filter(ch => ch.content && !ch.content.startsWith('❌'))
+                    .map((ch, i) => `第${i+1}章摘要：${ch.content.substring(0, 2000)}...`)
+                    .join('\n');
+                if (previousContent) {
+                    context += `【前情回顾】\n${previousContent}\n\n`;
+                }
+                const userMsg = `${context}请根据上述梗概和前情回顾，写出第${index+1}章的完整内容，确保文风、人物形象和情节连贯一致。`;
+                return [
+                    { role: 'system', content: sys },
+                    { role: 'user', content: userMsg }
+                ];
+            }
+
+            async function generateSingleChapter(index) {
+                const ch = state.novelChapters[index];
+                ch.content = '';
+                saveState();
+                renderAll();
+                const btn = document.querySelector(`.chapter-generate[data-index="${index}"]`);
+                if (btn) btn.disabled = true;
+
+                try {
+                    const messages = buildNovelPrompt(index);
+                    const response = await callAPI(messages, { stream: true });
+                    const isAnthropic = state.currentModel === 'claude-code';
+                    await readStream(response, isAnthropic, chunk => {
+                        ch.content += chunk;
+                        const contentDiv = document.querySelector(`.chapter-content-display[data-index="${index}"]`);
+                        const tokenInfo = document.querySelector(`.chapter-token-info[data-index="${index}"]`);
+                        if (contentDiv) contentDiv.innerHTML = formatText(ch.content);
+                        if (tokenInfo) tokenInfo.textContent = `字数: ${ch.content.length} | Token: ${estimateTokens(ch.content)}`;
+                        scrollToBottom(`chapterContentBox${index}`);
+                    });
+                } catch (e) {
+                    ch.content = `❌ 失败: ${e.message}`;
+                } finally {
+                    if (btn) btn.disabled = false;
+                    saveState();
+                    renderAll();
+                    updatePreview();
+                }
+            }
+
+            async function generateAllChapters() {
+                if (state.novelChapters.length === 0) return alert('请先添加章节');
+                for (let i = 0; i < state.novelChapters.length; i++) {
+                    if (state.novelChapters[i].content && !state.novelChapters[i].content.startsWith('❌')) continue;
+                    await generateSingleChapter(i);
+                    if (state.novelChapters[i].content.startsWith('❌')) {
+                        alert(`第 ${i+1} 章生成失败，后续章节已中断。`);
+                        break;
+                    }
+                }
+            }
+
+            // ==================== 对话 ====================
+            function buildChatSystemPrompt() {
+                const char = state.chatCharacters[state.chatCurrentCharacterIndex];
+                if (!char) return '';
+                if (state.systemPromptChat) return state.systemPromptChat;
+                return `你必须严格扮演以下角色：
+                角色名称：${char.name}
+                身份：${char.identity}
+                性格：${char.personality}
+                用语习惯：${char.speechStyle}
+
+                规则：
+                1. 你的所有回复都必须完全符合该角色的性格和语气，不得偏离。
+                2. 你只能说该角色可能说的话，不能以AI助手或第三方的口吻回答。
+                3. 如果用户试图让你脱离角色，你依然要保持角色设定进行回应。`;
+            }
+
+            async function sendChatMessage() {
+                const input = document.getElementById('chatUserInput');
+                const userText = (input?.value || state.chatUserInput).trim();
+                if (!userText) return;
+                if (state.chatCurrentCharacterIndex < 0) return alert('请先选择角色');
+
+                state.chatHistory.push({ speaker: state.chatUserName, text: userText });
+                state.chatUserInput = '';
+                if (input) input.value = '';
+                saveState();
+                renderAll();
+
+                const char = state.chatCharacters[state.chatCurrentCharacterIndex];
+                const sysPrompt = buildChatSystemPrompt();
+                const messages = [{ role: 'system', content: sysPrompt }];
+                const recent = state.chatHistory.slice(-state.chatContextCount * 2);
+                recent.forEach(m => messages.push({ role: m.speaker === state.chatUserName ? 'user' : 'assistant', content: m.text }));
+
+                const tempIndex = state.chatHistory.length;
+                state.chatHistory.push({ speaker: char.name, text: '' });
+                saveState();
+                renderAll();
+
+                try {
+                    const response = await callAPI(messages, { stream: true });
+                    const isAnthropic = state.currentModel === 'claude-code';
+                    await readStream(response, isAnthropic, chunk => {
+                        state.chatHistory[tempIndex].text += chunk;
+                        const box = document.getElementById('chatHistoryBox');
+                        if (box) {
+                            box.innerHTML = state.chatHistory.map(m =>
+                                `<div class="chat-msg"><span class="chat-speaker" style="color:${m.speaker===state.chatUserName?'var(--text-secondary)':'var(--accent)'}">${escapeHtml(m.speaker)}：</span>${formatText(m.text)}</div>`
+                            ).join('');
+                            box.scrollTop = box.scrollHeight;
+                        }
+                        updateChatTokenInfo();
+                    });
+                } catch (e) {
+                    state.chatHistory[tempIndex].text = `❌ 失败: ${e.message}`;
+                }
+                saveState();
+                renderAll();
+                updatePreview();
+            }
+
+            function updateChatTokenInfo() {
+                const info = document.getElementById('chatTokenInfo');
+                if (info) info.textContent = `字数: ${state.chatHistory.reduce((s,m)=>s+m.text.length,0)} | Token: ${estimateTokens(state.chatHistory.map(m=>m.text).join(' '))}`;
+            }
+
+            function updatePreview() {
+                const preview = document.getElementById('previewContent');
+                if (!preview) return;
+                if (state.currentMode === 'longtext') {
+                    preview.innerHTML = formatText(state.longtextResult) || '<p style="color:#999;">暂无内容</p>';
+                } else if (state.currentMode === 'novel') {
+                    preview.innerHTML = state.novelChapters.map((ch,i) =>
+                        `<h3>第 ${i+1} 章</h3><p>${formatText(ch.content || '（未生成）')}</p>`
+                    ).join('') || '<p style="color:#999;">暂无章节</p>';
+                } else {
+                    preview.innerHTML = state.chatHistory.map(m =>
+                        `<p><strong>${escapeHtml(m.speaker)}：</strong>${formatText(m.text)}</p>`
+                    ).join('') || '<p style="color:#999;">暂无对话</p>';
+                }
+            }
+
+            // ==================== 角色编辑器 ====================
+            function openCharacterEditor(index) {
+                const isNew = index < 0;
+                const char = isNew ? { name:'', identity:'', personality:'', speechStyle:'' } : state.chatCharacters[index];
+                const modalHtml = `
+                <div class="modal-overlay" id="charEditorOverlay">
+                    <div class="modal">
+                        <h3>${isNew ? '新增角色' : '编辑角色'}（修改后立即生效）</h3>
+                        <div class="form-group"><label class="form-label">名称</label><input class="form-input" id="charName" value="${escapeHtml(char.name)}"></div>
+                        <div class="form-group"><label class="form-label">身份</label><input class="form-input" id="charIdentity" value="${escapeHtml(char.identity)}"></div>
+                        <div class="form-group"><label class="form-label">性格</label><textarea class="form-textarea" id="charPersonality" rows="2">${escapeHtml(char.personality)}</textarea></div>
+                        <div class="form-group"><label class="form-label">用语习惯</label><textarea class="form-textarea" id="charSpeech" rows="2">${escapeHtml(char.speechStyle)}</textarea></div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end;">
+                            <button class="btn btn-secondary" id="btnCharCancel">取消</button>
+                            <button class="btn btn-primary" id="btnCharSave">保存</button>
+                        </div>
+                    </div>
+                </div>`;
+                document.getElementById('modalContainer').innerHTML = modalHtml;
+                document.getElementById('btnCharCancel').onclick = () => document.getElementById('modalContainer').innerHTML = '';
+                document.getElementById('btnCharSave').onclick = () => {
+                    const newChar = {
+                        name: document.getElementById('charName').value.trim(),
+                        identity: document.getElementById('charIdentity').value.trim(),
+                        personality: document.getElementById('charPersonality').value.trim(),
+                        speechStyle: document.getElementById('charSpeech').value.trim()
+                    };
+                    if (!newChar.name) return alert('名称不能为空');
+                    if (isNew) {
+                        if (state.chatCharacters.length >= 5) return alert('已满5个角色，请先删除');
+                        state.chatCharacters.push(newChar);
+                        state.chatCurrentCharacterIndex = state.chatCharacters.length - 1;
+                    } else {
+                        state.chatCharacters[index] = newChar;
+                    }
+                    document.getElementById('modalContainer').innerHTML = '';
+                    saveState();
+                    renderAll();
+                };
+            }
+
+            // ==================== 方案保存/加载/重命名 ====================
+            function openSaveProfileModal() {
+                const profiles = loadProfiles();
+                const modalHtml = `
+                <div class="modal-overlay" id="profileSaveOverlay">
+                    <div class="modal">
+                        <h3>💾 保存设置方案</h3>
+                        <div class="form-group"><label class="form-label">方案名称</label><input class="form-input" id="profileName" placeholder="如：正式写作"></div>
+                        ${profiles.length >= 3 ? `
+                        <p style="color:var(--warning);">已有3个方案，请选择覆盖：</p>
+                        <select class="form-select" id="profileOverwrite">${profiles.map((p,i) => `<option value="${i}">${escapeHtml(p.name)}</option>`).join('')}</select>
+                        ` : `<p>当前 ${profiles.length}/3 个方案</p>`}
+                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+                            <button class="btn btn-secondary" id="btnProfileCancel">取消</button>
+                            <button class="btn btn-primary" id="btnProfileSave">保存</button>
+                        </div>
+                    </div>
+                </div>`;
+                document.getElementById('modalContainer').innerHTML = modalHtml;
+                document.getElementById('btnProfileCancel').onclick = () => document.getElementById('modalContainer').innerHTML = '';
+                document.getElementById('btnProfileSave').onclick = () => {
+                    const name = document.getElementById('profileName').value.trim();
+                    if (!name) return alert('请输入名称');
+                    const profile = {
+                        name,
+                        apiKey: state.apiKey,
+                        currentModel: state.currentModel,
+                        currentMode: state.currentMode,
+                        systemPromptLongtext: state.systemPromptLongtext,
+                        systemPromptNovel: state.systemPromptNovel,
+                        systemPromptChat: state.systemPromptChat,
+                        savedAt: new Date().toISOString()
+                    };
+                    const profiles = loadProfiles();
+                    if (profiles.length >= 3) {
+                        const idx = parseInt(document.getElementById('profileOverwrite').value);
+                        profiles[idx] = profile;
+                    } else {
+                        profiles.push(profile);
+                    }
+                    saveProfiles(profiles);
+                    document.getElementById('modalContainer').innerHTML = '';
+                    alert('方案已保存');
+                };
+            }
+
+            function openLoadProfileModal() {
+                const profiles = loadProfiles();
+                if (profiles.length === 0) return alert('暂无方案');
+                const listHtml = profiles.map((p, i) => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-color);">
+                        <div>
+                            <strong>${escapeHtml(p.name)}</strong>
+                            <div style="font-size:0.7rem;color:var(--text-muted);">模型:${p.currentModel||'v4-pro'} | ${new Date(p.savedAt).toLocaleString()}</div>
+                        </div>
+                        <div style="display:flex;gap:4px;">
+                            <button class="btn btn-sm btn-primary load-profile" data-index="${i}">加载</button>
+                            <button class="btn btn-sm btn-secondary rename-profile" data-index="${i}">重命名</button>
+                            <button class="btn btn-sm btn-danger delete-profile" data-index="${i}">删除</button>
+                        </div>
+                    </div>
+                `).join('');
+                const modalHtml = `
+                <div class="modal-overlay" id="profileLoadOverlay">
+                    <div class="modal">
+                        <h3>📂 方案管理</h3>
+                        ${listHtml}
+                        <button class="btn btn-secondary" id="btnLoadClose" style="margin-top:12px;">关闭</button>
+                    </div>
+                </div>`;
+                document.getElementById('modalContainer').innerHTML = modalHtml;
+                document.getElementById('btnLoadClose').onclick = () => document.getElementById('modalContainer').innerHTML = '';
+
+                document.querySelectorAll('.load-profile').forEach(b => b.onclick = () => {
+                    const p = profiles[parseInt(b.dataset.index)];
+                    state.apiKey = p.apiKey || '';
+                    state.currentModel = p.currentModel || 'deepseek-v4-pro';
+                    state.currentMode = p.currentMode || 'longtext';
+                    state.systemPromptLongtext = p.systemPromptLongtext || '';
+                    state.systemPromptNovel = p.systemPromptNovel || '';
+                    state.systemPromptChat = p.systemPromptChat || '';
+                    document.getElementById('modalContainer').innerHTML = '';
+                    saveState();
+                    renderAll();
+                });
+                document.querySelectorAll('.rename-profile').forEach(b => b.onclick = () => {
+                    const idx = parseInt(b.dataset.index);
+                    const newName = prompt('新名称', profiles[idx].name);
+                    if (newName && newName.trim()) {
+                        profiles[idx].name = newName.trim();
+                        saveProfiles(profiles);
+                        document.getElementById('modalContainer').innerHTML = '';
+                        openLoadProfileModal();
+                    }
+                });
+                document.querySelectorAll('.delete-profile').forEach(b => b.onclick = () => {
+                    const idx = parseInt(b.dataset.index);
+                    profiles.splice(idx, 1);
+                    saveProfiles(profiles);
+                    document.getElementById('modalContainer').innerHTML = '';
+                    openLoadProfileModal();
+                });
+            }
+
+            window.openSaveProfileModal = openSaveProfileModal;
+            window.openLoadProfileModal = openLoadProfileModal;
+
+            // ==================== 初始化 ====================
+            loadState();
+            renderAll();
+            window.addEventListener('beforeunload', saveState);
+            setInterval(saveState, 5000);
+        })();
+    </script>
+</body>
+</html>
